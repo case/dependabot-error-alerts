@@ -1,0 +1,12 @@
+name: Hello
+
+on:
+  workflow_dispatch: # Enables the web UI manual trigger
+
+jobs:
+  test:
+    runs-on: ubuntu-slim
+
+    steps:
+      - name: Say hello
+        run: echo "Hello, friends!"
