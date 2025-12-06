@@ -121,4 +121,32 @@ describe('run', () => {
 
     expect(core.setFailed).not.toHaveBeenCalled()
   })
+
+  // Invalid lookback_days should throw an error with a clear message.
+  it('throws error for invalid lookback_days', async () => {
+    vi.mocked(core.getInput).mockImplementation((name: string) => {
+      const inputs: Record<string, string> = {
+        github_token: 'fake-token',
+        lookback_days: 'not-a-number',
+        fail_on_error: 'false',
+      }
+      return inputs[name] ?? ''
+    })
+
+    await expect(run()).rejects.toThrow('Invalid lookback_days')
+  })
+
+  // Zero or negative lookback_days should throw an error.
+  it('throws error for zero lookback_days', async () => {
+    vi.mocked(core.getInput).mockImplementation((name: string) => {
+      const inputs: Record<string, string> = {
+        github_token: 'fake-token',
+        lookback_days: '0',
+        fail_on_error: 'false',
+      }
+      return inputs[name] ?? ''
+    })
+
+    await expect(run()).rejects.toThrow('Invalid lookback_days')
+  })
 })
