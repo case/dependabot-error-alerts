@@ -1,0 +1,36 @@
+{
+  "name": "dependabot-error-alerts",
+  "version": "1.0.0",
+  "description": "GitHub Action to monitor and alert on Dependabot workflow failures",
+  "author": "Eric Case",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "keywords": [
+    "github-action",
+    "dependabot",
+    "monitoring",
+    "alerts"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/case/dependabot-error-alerts.git"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsdown": "^0.17.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}
