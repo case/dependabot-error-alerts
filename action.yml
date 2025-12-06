@@ -1,0 +1,33 @@
+name: 'Dependabot Error Alerts'
+description: 'Check for Dependabot workflow failures and alert'
+author: 'Eric Case'
+
+branding:
+  icon: 'alert-triangle'
+  color: 'orange'
+
+inputs:
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  lookback_days:
+    description: 'Number of days to look back for failures'
+    required: false
+    default: '7'
+  fail_on_error:
+    description: 'Fail the action if Dependabot failures are found'
+    required: false
+    default: 'false'
+
+outputs:
+  failure_count:
+    description: 'Number of Dependabot workflow failures found'
+  has_failures:
+    description: 'Whether any failures were found (true/false)'
+  failures_json:
+    description: 'JSON array of failure details (id, name, html_url, created_at)'
+
+runs:
+  using: 'node24'
+  main: 'dist/index.js'
