@@ -1,0 +1,37 @@
+name: Test end-to-end
+
+on:
+  workflow_dispatch: # Adds the Web trigger
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-e2e:
+    runs-on: ubuntu-slim
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run Dependabot Error Alerts
+        id: dependabot-check
+        uses: ./
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          lookback_days: "30"
+
+      - name: Verify outputs
+        run: |
+          echo "failure_count: ${{ steps.dependabot-check.outputs.failure_count }}"
+          echo "has_failures: ${{ steps.dependabot-check.outputs.has_failures }}"
+          echo "failures_json: ${{ steps.dependabot-check.outputs.failures_json }}"
+
+      - name: Validate expected failures
+        run: |
+          # This repo has an intentionally broken go.mod to trigger Dependabot failures
+          # So we expect has_failures to be 'true'
+          if [ "${{ steps.dependabot-check.outputs.has_failures }}" != "true" ]; then
+            echo "::warning::Expected Dependabot failures but found none. The broken go.mod may have been fixed or Dependabot hasn't run yet."
+          fi

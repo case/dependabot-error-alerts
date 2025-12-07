@@ -1,0 +1,31 @@
+name: Tests
+
+on:
+  workflow_dispatch: # Adds the Web trigger
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-slim
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: make deps
+
+      - name: Run tests
+        # - Runs the tests
+        # - Checks for TypeScript warnings
+        # - Confirms that dist/index.js is current
+        run: make test
