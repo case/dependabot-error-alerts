@@ -57,6 +57,16 @@ jobs:
 | `has_failures` | Whether any failures were found (`true`/`false`) |
 | `failures_json` | JSON array of failure details (`id`, `name`, `html_url`, `created_at`) |
 
+## FAQ
+
+**I have a failed Dependabot job, how do I debug it?**
+
+Debugging failed Dependabot jobs is not in scope here - this tool is essentially a very simple failed Dependabot job detector. In my experience, the errors are often transient (e.g. due to network connectivity issues with upstream container image registries, etc.) - but sometimes they are due to typos or syntactic issues in manifest files like `package.json` and `go.mod`. Doing a web search for the error message will usually help you find other folks who've encountered the same issue already.
+
+**Will this tool duplicate notifications for failed Dependabot jobs?**
+
+Yes, this tool is "dumb" in the sense that it's only checking for the presence of _any_ failed Dependabot job during the lookback period. It isn't tracking any detection state or notification history. If that seems like a desirable feature to add, we could probably do it with [`actions/upload-artifact`](https://docs.github.com/en/actions/tutorials/store-and-share-data) - e.g. by storing the failed job ID.
+
 ## Alternatives
 
 You don't actually need a fully fledged third-party Action from the Marketplace to do this - the `gh` CLI can easily access the same data as this TS code. Here's a prototype that you could save as a [composite action](https://docs.github.com/en/actions/tutorials/create-actions/create-a-composite-action), e.g. in your `.github/actions/dependabot-error-alerts/action.yaml`. It does the exact same things as the TS code, but lacks the tests, etc.
