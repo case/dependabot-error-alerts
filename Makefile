@@ -1,4 +1,4 @@
-.PHONY: deps test typecheck
+.PHONY: deps test typecheck build
 
 deps:
 	npm install
@@ -8,3 +8,6 @@ test: typecheck
 
 typecheck:
 	npm run typecheck
+
+build:
+	npm run build
