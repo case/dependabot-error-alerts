@@ -9,4 +9,6 @@ export default defineConfig({
   target: 'node24',
   // GitHub Actions expects dist/index.js, not .mjs
   outExtensions: ({ format, pkgType }) => ({ js: '.js' }),
+  // Bundle all dependencies - GitHub Actions runs dist/index.js directly without npm install
+  noExternal: [/.*/],
 })
