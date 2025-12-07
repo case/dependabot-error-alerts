@@ -5,8 +5,17 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: weekly
+      interval: monthly
       day: friday
+      time: "14:00"
+      timezone: "America/Los_Angeles"
+
+  # NodeJS
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "friday"
       time: "14:00"
       timezone: "America/Los_Angeles"
 
@@ -14,7 +23,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: friday
       time: "14:00"
       timezone: "America/Los_Angeles"
