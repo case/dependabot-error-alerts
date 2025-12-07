@@ -59,7 +59,7 @@ jobs:
 
 ## Alternatives
 
-You don't actually need a fully fledged third-party Action from the Marketplace to do this - the `gh` CLI can easily access the same data as this TS code. Here's a prototype that you could save as a composite action, e.g. in your `.github/actions/dependabot-error-alerts/action.yaml`. It does the exact same things as the TS code, but lacks the tests, etc.
+You don't actually need a fully fledged third-party Action from the Marketplace to do this - the `gh` CLI can easily access the same data as this TS code. Here's a prototype that you could save as a [composite action](https://docs.github.com/en/actions/tutorials/create-actions/create-a-composite-action), e.g. in your `.github/actions/dependabot-error-alerts/action.yaml`. It does the exact same things as the TS code, but lacks the tests, etc.
 
 ```yaml
 name: 'Dependabot Error Alerts'
