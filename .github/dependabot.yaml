@@ -1,7 +1,20 @@
 version: 2
+
 updates:
-  # Go
+  # Go - This will intentionally fail each week, per the e2e test workflow
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: weekly
+      day: friday
+      time: "14:00"
+      timezone: "America/Los_Angeles"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: friday
+      time: "14:00"
+      timezone: "America/Los_Angeles"
