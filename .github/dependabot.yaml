@@ -4,6 +4,8 @@ updates:
   # Go - This will intentionally fail each week, per the e2e test workflow
   - package-ecosystem: "gomod"
     directory: "/"
+    cooldown:
+      default-days: 14
     schedule:
       interval: monthly
       day: friday
@@ -13,6 +15,8 @@ updates:
   # NodeJS
   - package-ecosystem: "npm"
     directory: "/"
+    cooldown:
+      default-days: 14
     schedule:
       interval: "monthly"
       day: "friday"
@@ -22,6 +26,8 @@ updates:
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
+    cooldown:
+      default-days: 14
     schedule:
       interval: "monthly"
       day: friday
