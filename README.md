@@ -22,6 +22,9 @@ on:
     - cron: '0 9 * * 1'  # Weekly on Monday at 9am
   workflow_dispatch: # Web trigger
 
+permissions:
+  actions: read
+
 jobs:
   check:
     runs-on: ubuntu-slim
