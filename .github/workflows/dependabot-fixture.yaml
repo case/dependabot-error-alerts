@@ -1,0 +1,26 @@
+name: Dependabot fixture
+
+on:
+  workflow_dispatch: # Adds the Web trigger
+  schedule:
+    - cron: "0 23 * * 5" # Fridays 3pm Pacific (PST), after Dependabot's run
+
+permissions:
+  contents: read
+
+jobs:
+  fixture:
+    name: Dependabot fails on the go.mod fixture
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install tools from mise.toml
+        uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
+
+      - name: Run bin/test-dependabot-fixture
+        run: bin/test-dependabot-fixture

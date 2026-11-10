@@ -3,9 +3,12 @@ name: Hello
 on:
   workflow_dispatch: # Enables the web UI manual trigger
 
+permissions: {}
+
 jobs:
   test:
     runs-on: ubuntu-slim
+    timeout-minutes: 5
 
     steps:
       - name: Say hello

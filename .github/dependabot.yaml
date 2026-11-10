@@ -3,23 +3,12 @@ version: 2
 updates:
   # Go - This will intentionally fail each week, per the e2e test workflow
   - package-ecosystem: "gomod"
-    directory: "/"
+    directory: "/tests/fixtures/dependabot-failure"
     cooldown:
-      default-days: 14
+      default-days: 7
     schedule:
-      interval: monthly
+      interval: weekly
       day: friday
-      time: "14:00"
-      timezone: "America/Los_Angeles"
-
-  # NodeJS
-  - package-ecosystem: "npm"
-    directory: "/"
-    cooldown:
-      default-days: 14
-    schedule:
-      interval: "monthly"
-      day: "friday"
       time: "14:00"
       timezone: "America/Los_Angeles"
 
@@ -27,9 +16,9 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     cooldown:
-      default-days: 14
+      default-days: 7
     schedule:
-      interval: "monthly"
+      interval: weekly
       day: friday
       time: "14:00"
       timezone: "America/Los_Angeles"

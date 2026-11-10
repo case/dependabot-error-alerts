@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Run linters and formatting checks. Fix formatting with: ruff format
+set -euo pipefail
+cd "$(dirname "$0")/.."
+if command -v mise >/dev/null 2>&1; then eval "$(mise env -s bash)"; fi
+
+ruff check
+ruff format --check
+jactionlint --profile default
+shellcheck bin/*

@@ -7,31 +7,56 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   test-e2e:
-    runs-on: ubuntu-slim
-
+    name: E2E (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-slim, ubuntu-26.04, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Run Dependabot Error Alerts
         id: dependabot-check
         uses: ./
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           lookback_days: "30"
 
-      - name: Verify outputs
+      - name: Validate outputs
+        env:
+          FAILURE_COUNT: ${{ steps.dependabot-check.outputs.failure_count }}
+          HAS_FAILURES: ${{ steps.dependabot-check.outputs.has_failures }}
+          FAILURES_JSON: ${{ steps.dependabot-check.outputs.failures_json }}
         run: |
-          echo "failure_count: ${{ steps.dependabot-check.outputs.failure_count }}"
-          echo "has_failures: ${{ steps.dependabot-check.outputs.has_failures }}"
-          echo "failures_json: ${{ steps.dependabot-check.outputs.failures_json }}"
-
-      - name: Validate expected failures
-        run: |
-          # This repo has an intentionally broken go.mod to trigger Dependabot failures
-          # So we expect has_failures to be 'true'
-          if [ "${{ steps.dependabot-check.outputs.has_failures }}" != "true" ]; then
+          python="$(command -v python3 || command -v python)"
+          "$python" - <<'PY'
+          import json, os
+          count = int(os.environ["FAILURE_COUNT"])
+          has = os.environ["HAS_FAILURES"]
+          failures = json.loads(os.environ["FAILURES_JSON"])
+          assert has in ("true", "false"), has
+          assert len(failures) == count, (len(failures), count)
+          assert (has == "true") == (count > 0), (has, count)
+          print(f"failure_count={count} has_failures={has}")
+          PY
+          # The broken go.mod makes Dependabot fail weekly, so failures are expected.
+          if [ "$HAS_FAILURES" != "true" ]; then
             echo "::warning::Expected Dependabot failures but found none. The broken go.mod may have been fixed or Dependabot hasn't run yet."
           fi
