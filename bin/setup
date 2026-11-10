@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Install the lint tools and check that Python 3.12+ is available.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if command -v mise >/dev/null 2>&1; then
+  mise install
+  eval "$(mise env -s bash)"
+fi
+
+missing=0
+if python3 -c 'import sys; sys.exit(sys.version_info < (3, 12))' 2>/dev/null; then
+  echo "✓ python3 ($(python3 --version))"
+else
+  echo "✗ python3 3.12 or newer not found"
+  missing=1
+fi
+for tool in ruff jactionlint shellcheck; do
+  if command -v "$tool" >/dev/null 2>&1; then
+    echo "✓ $tool"
+  else
+    echo "✗ $tool not found: install the version pinned in mise.toml"
+    missing=1
+  fi
+done
+exit "$missing"

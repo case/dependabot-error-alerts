@@ -23,11 +23,32 @@ inputs:
 outputs:
   failure_count:
     description: 'Number of Dependabot workflow failures found'
+    value: ${{ steps.check.outputs.failure_count }}
   has_failures:
     description: 'Whether any failures were found (true/false)'
+    value: ${{ steps.check.outputs.has_failures }}
   failures_json:
     description: 'JSON array of failure details (id, name, html_url, created_at)'
+    value: ${{ steps.check.outputs.failures_json }}
 
 runs:
-  using: 'node24'
-  main: 'dist/index.js'
+  using: 'composite'
+  steps:
+    - name: Check for Dependabot failures
+      id: check
+      shell: bash
+      env:
+        INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
+        INPUT_LOOKBACK_DAYS: ${{ inputs.lookback_days }}
+        INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
+      run: |
+        python="$(command -v python3 || command -v python || true)"
+        if [ -z "$python" ]; then
+          echo "::error::Python 3.12 or newer is required on the runner"
+          exit 1
+        fi
+        if ! "$python" -c 'import sys; sys.exit(sys.version_info < (3, 12))'; then
+          echo "::error::Python 3.12 or newer is required; found $("$python" --version 2>&1). Add an actions/setup-python step."
+          exit 1
+        fi
+        "$python" "$GITHUB_ACTION_PATH/check_dependabot.py"

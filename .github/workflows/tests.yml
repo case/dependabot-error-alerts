@@ -7,25 +7,29 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  test:
-    runs-on: ubuntu-slim
+permissions:
+  contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
     steps:
       - name: Check out repo
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: "24"
-          cache: "npm"
+          persist-credentials: false
 
-      - name: Install dependencies
-        run: make deps
+      - name: Install lint tools from mise.toml
+        uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
 
-      - name: Run tests
-        # - Runs the tests
-        # - Checks for TypeScript warnings
-        # - Confirms that dist/index.js is current
-        run: make test
+      - name: Run bin/ci
+        run: bin/ci
+
+      - name: Run the tests on the minimum supported Python
+        run: mise exec python@3.12 -- python -m unittest discover -s tests -t .

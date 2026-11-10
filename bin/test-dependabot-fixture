@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Run Dependabot's gomod update against the broken fixture and check it fails to parse. Needs Docker.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+if command -v mise >/dev/null 2>&1; then eval "$(mise env -s bash)"; fi
+
+dir="$(yq eval '.updates[] | select(."package-ecosystem" == "gomod") | .directory' .github/dependabot.yaml)"
+if [ -z "$dir" ] || [ "$dir" = "null" ]; then
+  echo "✗ no gomod entry in .github/dependabot.yaml"
+  exit 1
+fi
+
+log="$(mktemp)"
+trap 'rm -f "$log"' EXIT
+echo "Running Dependabot gomod update in $dir"
+# Dependabot exits non-zero when the update fails, which is the expected result here.
+dependabot update go_modules "${GITHUB_REPOSITORY:-case/dependabot-error-alerts}" \
+  --local "$PWD" --directory "$dir" --timeout 10m >"$log" 2>&1 || true
+
+python3 - "$log" "${dir%/}/go.mod" <<'PY'
+import json, sys
+
+log_path, expected_path = sys.argv[1], sys.argv[2]
+errors = []
+with open(log_path, encoding="utf-8", errors="replace") as log:
+    for line in log:
+        if not line.startswith("{"):
+            continue
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if event.get("type") == "record_update_job_error":
+            errors.append(event["data"])
+
+for error in errors:
+    details = error.get("error-details", {})
+    if error.get("error-type") == "dependency_file_not_parseable" and details.get("file-path") == expected_path:
+        print(f"✓ Dependabot failed as expected on {expected_path}: {details.get('message')}")
+        sys.exit(0)
+
+print(f"✗ expected dependency_file_not_parseable on {expected_path}; recorded errors: {errors}")
+with open(log_path, encoding="utf-8", errors="replace") as log:
+    print("".join(log.readlines()[-40:]))
+sys.exit(1)
+PY
