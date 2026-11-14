@@ -1,7 +1,7 @@
 # Tools used by the bin/ scripts. The action itself needs only the runner's Python.
 [tools]
 "github:dependabot/cli" = "1.97.0"
-jactionlint = "2.4.0"
-ruff = "0.17.3"
+jactionlint = { version = "2.5.0", workflow = "release.yaml" }
+ruff = "0.17.4"
 shellcheck = "0.11.0"
-yq = "4.54.1"
+yq = "4.54.2"
